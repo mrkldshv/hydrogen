@@ -1,5 +1,49 @@
 # Changelog
 
+## 1.1.0
+
+### Minor Changes
+
+- Replace graphiql with graphql/graphql-playground in local development at '/graphql` route. ([#1710](https://github.com/Shopify/hydrogen/pull/1710)) by [@cartogram](https://github.com/cartogram)
+
+* Expose utilities for integrating Hydrogen with 3rd party platforms in `@shopify/hydrogen/platforms`. These utilities can resolve the project build path automatically and also find the client build assets. ([#1772](https://github.com/Shopify/hydrogen/pull/1772)) by [@frandiox](https://github.com/frandiox)
+
+  ```js
+  import {
+    handleRequest, // Instead of './src/App.server'
+    indexTemplate, // Instead of './dist/client/index.html?raw'
+    isAsset, // Access a list of files in './dist/client/**/*'
+  } from '@shopify/hydrogen/platforms';
+
+  // Platform entry handler
+  export default function(request) {
+    if (isAsset(new URL(request.url).pathname)) {
+      return platformAssetHandler(request);
+    }
+
+    return handleRequest(request, {indexTemplate});
+  }
+  ```
+
+  Note that user apps don't need to be changed.
+
+### Patch Changes
+
+- The payload returned by `fetchSync` was supposed to mimic `react-fetch` but it wrongly moved the Response data to a sub-property `response`. This has been fixed to have the Response at the top level. Also, cached responses are now correctly serialized and retrieved to avoid issues on cache hit. ([#1760](https://github.com/Shopify/hydrogen/pull/1760)) by [@frandiox](https://github.com/frandiox)
+
+  ```diff
+  const response = fetchSync('...');
+  -response.response.headers.get('...');
+  +response.headers.get('...');
+  const jsonData = response.json();
+  ```
+
+  Note that the sub-property `response` is still available but marked as deprecated.
+
+* `null` shopId fix on the `PerformanceMetrics` component ([#1722](https://github.com/Shopify/hydrogen/pull/1722)) by [@wizardlyhel](https://github.com/wizardlyhel)
+
+- Fix server props when using non UTF-8 characters in URL. ([#1780](https://github.com/Shopify/hydrogen/pull/1780)) by [@frandiox](https://github.com/frandiox)
+
 ## 1.0.2
 
 ### Patch Changes
